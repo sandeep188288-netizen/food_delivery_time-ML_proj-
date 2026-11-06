@@ -306,17 +306,3 @@ These files are loaded when the FastAPI application starts.
 - Improve frontend responsiveness and user experience.
 - Add prediction history and monitoring.
 
-## Author
-
-**Sandeep Kushwaha**
-
-B.Tech – Artificial Intelligence and Machine Learning
-
-Lakshmi Narain College of Technology, Bhopal
-
-- GitHub: https://github.com/sandeep188288-netizen
-- LinkedIn: https://www.linkedin.com/in/sandeep-kushwaha-266447379/
-
----
-
-If you find this project useful, feel free to explore the repository.
