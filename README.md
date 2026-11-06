@@ -1,58 +1,69 @@
 
-# Food Delivery Time Prediction
+# 🍔 Food Delivery Time Prediction
 
-A Machine Learning project that predicts the estimated time required to deliver a food order based on delivery distance, traffic conditions, weather, order details, vehicle information and delivery-person attributes.
+### Machine Learning | XGBoost | FastAPI | Docker | Render
 
-The project covers the complete ML workflow, starting from data analysis and preprocessing to model training, hyperparameter tuning and deployment through a FastAPI web application.
+A machine learning-based web application that predicts the estimated delivery time of food orders using delivery-person details, order information, traffic conditions, weather, vehicle condition and delivery distance.
 
-## Project Overview
+The project takes a complete machine learning workflow from data analysis and preprocessing to model training, hyperparameter tuning and deployment. The final tuned XGBoost model is integrated with a FastAPI backend and an interactive web interface.
 
-Food delivery time depends on several factors, including distance between the restaurant and customer, traffic conditions, weather, vehicle condition and delivery-person details.
+🚀 **Live Demo:** https://food-delivery-time-ml-proj.onrender.com/
 
-The objective of this project is to build a regression model that can estimate delivery time using these factors.
+---
 
-After experimenting with multiple regression algorithms, a tuned **XGBoost Regressor** was selected for the prediction system.
+## 🌐 Live Application
 
-The trained model is integrated with a FastAPI backend and an interactive frontend where users can enter delivery details and get an estimated delivery time in minutes.
+The application is deployed on Render and can be accessed here:
 
-## Key Features
+**[Open QuickBite AI – Food Delivery Time Prediction](https://food-delivery-time-ml-proj.onrender.com/)**
+
+Users can enter delivery-related information and get an estimated delivery time in minutes.
+
+---
+
+## 📌 Project Overview
+
+Food delivery time depends on several factors, such as the distance between the restaurant and customer, traffic conditions, weather, vehicle condition and delivery-person ratings.
+
+The objective of this project is to develop a regression model that estimates food delivery time using these factors.
+
+Different regression algorithms were trained and evaluated. After comparing their performance, a tuned **XGBoost Regressor** was selected as the final model.
+
+The trained model is deployed through a FastAPI application with an interactive frontend.
+
+## ✨ Key Features
 
 - Exploratory Data Analysis (EDA)
 - Data cleaning and preprocessing
-- Feature engineering
-- Training and comparison of regression models
+- Feature engineering using geographical coordinates
+- Training and comparison of multiple regression models
 - Hyperparameter tuning using RandomizedSearchCV
-- Tuned XGBoost regression model
-- Model and preprocessing artifact serialization using Joblib
-- FastAPI-based prediction API
-- Interactive HTML, CSS and JavaScript frontend
+- Optimized XGBoost regression model
+- Interactive web-based prediction interface
+- FastAPI backend for model inference
 - Distance calculation using the Haversine formula
-- Docker support for containerization
+- Docker support
+- Live deployment on Render
 
-## Machine Learning Workflow
+---
 
-The project follows the workflow below:
+## 📊 Dataset Information
 
-1. Dataset loading and inspection
-2. Data cleaning and handling missing values
-3. Exploratory Data Analysis
-4. Feature engineering
-5. Categorical feature encoding
-6. Feature scaling
-7. Train-test split
-8. Regression model training
-9. Model evaluation and comparison
-10. XGBoost hyperparameter tuning
-11. Saving the trained model and preprocessing artifacts
-12. Integrating the model with FastAPI
+The project uses a food delivery dataset containing order details, delivery-person information, geographical coordinates and environmental conditions.
 
-## Dataset Information
+| Dataset Information | Details |
+|---|---|
+| Original Records | 45,593 |
+| Records After Cleaning | 45,162 |
+| Target Variable | `Time_taken(min)` |
+| Problem Type | Regression |
+| Removed Records | 431 |
 
-**Dataset:** Food Delivery Dataset
+Records with impossible delivery distances (greater than 100 km) were removed during data cleaning.
 
-**Target Variable:** `Time_taken(min)`
+### Target Variable
 
-The target variable represents the time taken to deliver an order, measured in minutes.
+`Time_taken(min)` represents the time required to deliver an order, measured in minutes.
 
 ### Features Used
 
@@ -65,101 +76,158 @@ The target variable represents the time taken to deliver an order, measured in m
 | Road_traffic_density | Traffic condition during delivery |
 | Vehicle_condition | Condition of the delivery vehicle |
 | multiple_deliveries | Number of deliveries handled together |
-| Type_of_order | Type of food order |
+| Type_of_order | Category of the food order |
 | Type_of_vehicle | Vehicle used for delivery |
 | Festival | Festival-related information |
 | City | City category |
-| Weatherconditions | Weather during delivery |
+| Weatherconditions | Weather conditions |
 
-## Exploratory Data Analysis
+---
 
-EDA was performed to understand the dataset and identify patterns that may affect delivery time.
+## 🔍 Data Cleaning and Preprocessing
 
-The analysis includes:
+The following preprocessing steps were performed:
 
-- Distribution of delivery time
-- Distribution of numerical features
-- Relationship between delivery distance and delivery time
-- Impact of traffic conditions on delivery time
-- Impact of weather conditions
-- Vehicle condition analysis
-- Delivery-person ratings analysis
-- Correlation heatmap
-- Analysis of categorical features
-
-## Feature Engineering and Preprocessing
-
-Several preprocessing steps were performed before training the machine learning models.
-
-- Extracted the order hour from order time.
-- Calculated delivery distance using restaurant and delivery coordinates.
-- Encoded categorical features.
-- Prepared numerical and categorical features for model training.
+- Removed records with impossible geographical distances.
+- Cleaned inconsistent text values in categorical columns.
+- Handled missing values using median and mode imputation.
+- Capped delivery-person ratings at the maximum rating of 5.
+- Converted categorical variables into numerical representations.
 - Applied feature scaling using StandardScaler.
-- Maintained the feature-column order required by the trained model.
 
-The same preprocessing logic must be maintained during prediction to ensure consistency between training and inference.
+## ⚙️ Feature Engineering
 
-## Model Training and Evaluation
+Feature engineering was an important part of this project.
 
-Multiple regression algorithms were explored and compared to identify a suitable model for predicting delivery time.
+### 1. Distance Calculation
 
-The models include:
+Restaurant and delivery-location coordinates were used to calculate the geographical distance in kilometres using the Haversine formula.
+
+### 2. Order Hour Extraction
+
+The order time was converted into an hour feature (`order_hour`) to capture time-related delivery patterns.
+
+### 3. Traffic Encoding
+
+Road traffic density was encoded as follows:
+
+| Traffic Condition | Encoded Value |
+|---|---:|
+| Low | 0 |
+| Medium | 1 |
+| High | 2 |
+| Jam | 3 |
+
+### 4. Categorical Encoding
+
+Categorical features such as order type, vehicle type, city, festival and weather conditions were converted using one-hot encoding.
+
+### 5. Feature Scaling
+
+StandardScaler was used to scale the model input features.
+
+---
+
+## 🤖 Model Training and Comparison
+
+Multiple regression algorithms were trained and evaluated to identify the most suitable model.
+
+The following models were compared:
 
 - Linear Regression
 - Decision Tree Regressor
 - Random Forest Regressor
 - XGBoost Regressor
 
-The models were evaluated using regression evaluation metrics such as:
+### Model Performance
 
-- R² Score
-- Mean Absolute Error (MAE)
-- Root Mean Squared Error (RMSE)
+| Model | Test R² Score | Test RMSE | Train R² Score |
+|---|---:|---:|---:|
+| Linear Regression | 0.57 | 6.21 min | 0.58 |
+| Decision Tree | 0.67 | 5.47 min | 1.00 |
+| Random Forest | 0.82 | 4.04 min | 0.97 |
+| **Tuned XGBoost** | **0.83** | **3.92 min** | **0.85** |
 
-### XGBoost Hyperparameter Tuning
+### Final Model: XGBoost Regressor
 
-XGBoost was further optimized using `RandomizedSearchCV`.
+The tuned XGBoost model achieved the best test performance among the evaluated models.
 
-The search configuration included:
+- **Test R² Score:** 0.83
+- **Test RMSE:** 3.92 minutes
+- **Train R² Score:** 0.85
 
-- `n_iter = 40`
-- `cv = 3`
-- `scoring = 'r2'`
-- `random_state = 42`
-- `n_jobs = -1`
+The difference between training and testing performance is smaller than that of the Decision Tree and Random Forest models, indicating better generalisation on the test data.
 
-The hyperparameter search space included:
+### Hyperparameter Tuning
 
-| Parameter | Search Values |
-|---|---|
-| n_estimators | 300, 500, 800 |
-| max_depth | 3, 4, 5, 6, 8 |
-| learning_rate | 0.01, 0.03, 0.05, 0.1 |
-| subsample | 0.7, 0.8, 0.9, 1.0 |
-| colsample_bytree | 0.7, 0.8, 0.9, 1.0 |
-| reg_alpha | 0, 0.1, 0.5, 1 |
-| reg_lambda | 1, 1.5, 2 |
+RandomizedSearchCV was used to find suitable XGBoost hyperparameters.
 
-The best estimator obtained from the search was saved as the final prediction model.
+Search configuration:
 
-## Application Architecture
+```python
+RandomizedSearchCV(
+    estimator=xgb,
+    param_distributions=param_grid,
+    n_iter=40,
+    cv=3,
+    scoring='r2',
+    random_state=42,
+    n_jobs=-1
+)
+```
 
-The trained model is integrated into a web application using FastAPI.
+Best model configuration:
 
-The application works as follows:
+| Parameter | Selected Value |
+|---|---:|
+| n_estimators | 500 |
+| max_depth | 8 |
+| learning_rate | 0.01 |
+| subsample | 0.9 |
 
-1. The user enters delivery details through the frontend.
-2. Restaurant and delivery-location coordinates are used to calculate distance.
-3. Order time is converted into an hour value.
-4. Input data is prepared according to the model's expected features.
-5. The saved scaler and model are loaded by the backend.
-6. The model generates a delivery-time prediction.
-7. The predicted delivery time is returned to the frontend in minutes.
+---
 
-## Tech Stack
+## 🏗️ Application Architecture
 
-| Category | Technology |
+The application connects the trained machine learning model with a web interface using FastAPI.
+
+```text
+             User
+               |
+               v
+       HTML/CSS/JavaScript
+               |
+               v
+          FastAPI API
+               |
+               v
+       Input Preprocessing
+               |
+               v
+       Distance Calculation
+        (Haversine Formula)
+               |
+               v
+       Feature Preparation
+               |
+               v
+         StandardScaler
+               |
+               v
+        Tuned XGBoost
+               |
+               v
+       Delivery Time Prediction
+               |
+               v
+         Result in Minutes
+```
+
+---
+
+## 🛠️ Tech Stack
+
+| Category | Technologies |
 |---|---|
 | Programming Language | Python |
 | Data Analysis | Pandas, NumPy |
@@ -172,9 +240,12 @@ The application works as follows:
 | API Server | Uvicorn |
 | Frontend | HTML, CSS, JavaScript |
 | Containerization | Docker |
+| Deployment | Render |
 | Development Environment | Jupyter Notebook, VS Code |
 
-## Project Structure
+---
+
+## 📁 Project Structure
 
 ```text
 food_delivery_time-ML_proj-/
@@ -193,11 +264,12 @@ food_delivery_time-ML_proj-/
 ├── requirements.txt
 ├── Dockerfile
 ├── .gitignore
-│
 └── README.md
 ```
 
-## Installation and Setup
+---
+
+## 🚀 Run the Project Locally
 
 ### 1. Clone the Repository
 
@@ -233,13 +305,13 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 4. Run the FastAPI Application
+### 4. Start FastAPI
 
 ```bash
 python -m uvicorn app:app --reload
 ```
 
-If you need the optional CORS wrapper:
+If you want to run the optional CORS wrapper:
 
 ```bash
 python -m uvicorn run_cors:app --reload
@@ -251,23 +323,15 @@ Frontend:
 
 http://127.0.0.1:8000/
 
-FastAPI Swagger Documentation:
+API Documentation:
 
 http://127.0.0.1:8000/docs
 
-## API Endpoints
+---
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/` | Serves the frontend application |
-| POST | `/predict` | Predicts estimated food delivery time |
-| GET | `/docs` | Interactive FastAPI documentation |
+## 🐳 Run with Docker
 
-The `/predict` endpoint accepts delivery-related input and returns the estimated delivery time in minutes.
-
-## Docker Deployment
-
-The project also includes a Dockerfile to run the FastAPI application inside a Docker container.
+Docker is included to make it easier to run the application in a containerized environment.
 
 ### Build Docker Image
 
@@ -281,28 +345,61 @@ docker build -t food-delivery-api .
 docker run -p 8000:8000 food-delivery-api
 ```
 
-Open the application:
+Open:
 
 http://127.0.0.1:8000/
 
-## Saved Model Files
+---
 
-The following files are required by the backend:
+## 📦 Saved Model Artifacts
+
+The following files are used by the FastAPI backend:
 
 | File | Purpose |
 |---|---|
-| xgb_best.pkl | Trained and tuned XGBoost model |
-| standard_scaler.pkl | Saved StandardScaler |
-| model_columns.pkl | Expected feature-column order |
+| `xgb_best.pkl` | Trained and tuned XGBoost model |
+| `standard_scaler.pkl` | Saved StandardScaler |
+| `model_columns.pkl` | Expected feature-column order |
 
-These files are loaded when the FastAPI application starts.
+These artifacts are loaded by the backend to preprocess input data and generate predictions.
 
-## Future Improvements
+---
 
-- Improve prediction accuracy through additional feature engineering.
-- Experiment with additional regression algorithms.
-- Add more detailed model evaluation and explainability.
-- Deploy the application on a cloud platform.
-- Improve frontend responsiveness and user experience.
-- Add prediction history and monitoring.
+## 🔌 API Endpoints
 
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/` | Serves the frontend application |
+| POST | `/predict` | Predicts estimated food delivery time |
+| GET | `/docs` | Interactive API documentation |
+
+The prediction endpoint accepts delivery details and returns the estimated delivery time in minutes.
+
+---
+
+## 🔮 Future Improvements
+
+- Experiment with additional feature engineering techniques.
+- Improve prediction performance with more delivery data.
+- Add model explainability using SHAP.
+- Introduce prediction history and analytics.
+- Improve frontend visualisation and user experience.
+- Add automated model monitoring.
+
+---
+
+## 👨‍💻 Author
+
+**Sandeep Kushwaha**
+
+B.Tech – Artificial Intelligence and Machine Learning  
+Lakshmi Narain College of Technology, Bhopal
+
+- GitHub: [sandeep188288-netizen](https://github.com/sandeep188288-netizen)
+- LinkedIn: [Sandeep Kushwaha](https://www.linkedin.com/in/sandeep-kushwaha-266447379/)
+
+---
+
+⭐ If you find this project interesting, feel free to explore the repository and try the live application.
+
+**Live Demo:** https://food-delivery-time-ml-proj.onrender.com/
