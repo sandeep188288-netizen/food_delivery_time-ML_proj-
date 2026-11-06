@@ -386,20 +386,5 @@ The prediction endpoint accepts delivery details and returns the estimated deliv
 - Improve frontend visualisation and user experience.
 - Add automated model monitoring.
 
----
-
-## 👨‍💻 Author
-
-**Sandeep Kushwaha**
-
-B.Tech – Artificial Intelligence and Machine Learning  
-Lakshmi Narain College of Technology, Bhopal
-
-- GitHub: [sandeep188288-netizen](https://github.com/sandeep188288-netizen)
-- LinkedIn: [Sandeep Kushwaha](https://www.linkedin.com/in/sandeep-kushwaha-266447379/)
-
----
-
-⭐ If you find this project interesting, feel free to explore the repository and try the live application.
 
 **Live Demo:** https://food-delivery-time-ml-proj.onrender.com/
