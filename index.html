@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuickBite AI · Food Delivery Time Prediction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060a14; --navy:#0b1226; --panel:rgba(17,25,46,.62); --panel2:rgba(255,255,255,.04);
+  --line:rgba(255,255,255,.09); --text:#e9edf7; --muted:#8f9bb8;
+  --o1:#ff7a1a; --o2:#ffb25e; --red:#ff5d5d; --green:#3ddc97;
+  --head:'Bricolage Grotesque',system-ui,sans-serif; --body:'DM Sans',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:var(--body);background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;
+  background-image:radial-gradient(900px 500px at 85% -5%,rgba(255,122,26,.16),transparent 60%),radial-gradient(800px 600px at -10% 30%,rgba(40,70,160,.22),transparent 60%)}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--o2);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+h1,h2,h3{font-family:var(--head);line-height:1.1;letter-spacing:-.02em}
+
+/* nav */
+nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);background:rgba(6,10,20,.7);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:66px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--head);font-weight:800;font-size:1.25rem}
+.logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--o1),var(--o2));display:grid;place-items:center;box-shadow:0 6px 20px rgba(255,122,26,.4)}
+.brand b{color:var(--o1)}
+.links{display:flex;gap:26px;align-items:center;font-size:.95rem;color:var(--muted)}
+.links a:hover{color:var(--text)}
+.pill{display:flex;align-items:center;gap:8px;font-size:.8rem;padding:6px 12px;border:1px solid var(--line);border-radius:99px;background:var(--panel2);color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:#667;}
+.dot.on{background:var(--green);box-shadow:0 0 10px var(--green)}.dot.off{background:var(--red)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;cursor:pointer;font:600 1rem var(--body);color:#1a0d00;padding:14px 26px;border-radius:14px;
+  background:linear-gradient(135deg,var(--o1),var(--o2));box-shadow:0 10px 30px rgba(255,122,26,.35);transition:transform .2s,box-shadow .2s,filter .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 38px rgba(255,122,26,.5)}
+.btn:disabled{cursor:progress;filter:saturate(.7) brightness(.9);transform:none}
+.btn.ghost{background:var(--panel2);color:var(--text);border:1px solid var(--line);box-shadow:none}
+.btn.ghost:hover{border-color:var(--o1)}
+.btn.sm{padding:9px 16px;font-size:.88rem;border-radius:11px}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center;padding:70px 0 40px}
+.badge{display:inline-flex;gap:8px;align-items:center;font-size:.85rem;color:var(--o2);border:1px solid rgba(255,122,26,.3);background:rgba(255,122,26,.08);padding:6px 14px;border-radius:99px;margin-bottom:22px}
+h1{font-size:clamp(2.4rem,5.4vw,4.2rem);font-weight:800}
+h1 span{background:linear-gradient(120deg,var(--o1),var(--o2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--muted);font-size:1.12rem;max-width:520px;margin:20px 0 30px}
+.cta{display:flex;gap:14px;flex-wrap:wrap}
+.stats{display:flex;gap:34px;margin-top:40px;flex-wrap:wrap}
+.stats div{border-left:2px solid var(--o1);padding-left:14px}
+.stats strong{display:block;font:800 1.5rem var(--head)}
+.stats small{color:var(--muted);font-size:.82rem}
+.scene{position:relative;border-radius:28px;border:1px solid var(--line);background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.015));backdrop-filter:blur(10px);padding:14px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.scene svg{width:100%;height:auto;display:block;border-radius:20px}
+.chip{position:absolute;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:14px;font-size:.85rem;font-weight:500;background:rgba(10,16,34,.85);border:1px solid var(--line);backdrop-filter:blur(10px);animation:float 6s ease-in-out infinite}
+.chip:nth-of-type(2){animation-delay:-2s}.chip:nth-of-type(3){animation-delay:-4s}
+@keyframes float{50%{transform:translateY(-10px)}}
+
+/* sections */
+section{padding:60px 0}
+.sec-h{margin-bottom:34px;max-width:640px}
+.sec-h h2{font-size:clamp(1.8rem,3.4vw,2.6rem)}
+.sec-h p{color:var(--muted);margin-top:12px}
+.dash{display:grid;grid-template-columns:1.55fr 1fr;gap:26px;align-items:start}
+.glass{background:var(--panel);border:1px solid var(--line);border-radius:24px;backdrop-filter:blur(14px);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+form{padding:10px 28px 28px}
+fieldset{border:0;padding:22px 0;border-bottom:1px solid var(--line)}
+fieldset:last-of-type{border-bottom:0}
+legend{display:flex;align-items:center;gap:10px;font:700 1.05rem var(--head);margin-bottom:16px;float:left;width:100%}
+legend i{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(255,122,26,.12);color:var(--o1)}
+legend + .grid{clear:both}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field.full{grid-column:1/-1}
+label,.lab{font-size:.85rem;font-weight:500;color:#c4cce0}
+input,select{width:100%;background:rgba(5,9,20,.7);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font:400 .95rem var(--body);transition:border .2s,box-shadow .2s;color-scheme:dark}
+input::placeholder{color:#59658a}
+input:hover,select:hover{border-color:rgba(255,255,255,.2)}
+input:focus,select:focus{outline:0;border-color:var(--o1);box-shadow:0 0 0 4px rgba(255,122,26,.15)}
+.hint{font-size:.76rem;color:#6e7b9c}
+.err{font-size:.78rem;color:var(--red);min-height:0}
+.field.bad input,.field.bad select{border-color:var(--red)}
+.seg{display:flex;gap:6px;background:rgba(5,9,20,.7);border:1px solid var(--line);border-radius:12px;padding:4px}
+.seg label{flex:1;text-align:center;padding:8px 4px;border-radius:9px;cursor:pointer;font-size:.88rem;color:var(--muted);transition:.2s}
+.seg input{position:absolute;opacity:0;width:0;pointer-events:none}
+.seg input:checked+span{color:#1a0d00}
+.seg label:has(input:checked){background:linear-gradient(135deg,var(--o1),var(--o2));color:#1a0d00;font-weight:600}
+.seg label:has(input:focus-visible){outline:2px solid var(--o2)}
+.field.bad .seg{border-color:var(--red)}
+.dist{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:rgba(255,122,26,.07);border:1px dashed rgba(255,122,26,.35);font-size:.88rem;color:var(--muted)}
+.dist b{color:var(--o2);font:700 1.05rem var(--head)}
+.dist.warn b{color:var(--red)}
+.actions{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
+.actions .btn:first-child{flex:1;min-width:220px;padding:17px}
+.spin{width:18px;height:18px;border:3px solid rgba(26,13,0,.3);border-top-color:#1a0d00;border-radius:50%;animation:rot .8s linear infinite;display:none}
+.loading .spin{display:block}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* result */
+.side{position:sticky;top:90px;padding:28px;min-height:360px;display:flex;flex-direction:column;justify-content:center;text-align:center;overflow:hidden}
+.side .state{display:none;animation:pop .5s cubic-bezier(.2,.9,.3,1.2)}
+.side[data-s=idle] .idle,.side[data-s=load] .load,.side[data-s=ok] .ok,.side[data-s=err] .errp{display:block}
+@keyframes pop{from{opacity:0;transform:scale(.94) translateY(10px)}}
+.ghost-ic{font-size:3rem;margin-bottom:10px;filter:grayscale(.3)}
+.side h3{font-size:1.25rem;margin-bottom:8px}
+.side p{color:var(--muted);font-size:.92rem}
+.big{font:800 5.2rem/1 var(--head);background:linear-gradient(120deg,var(--o1),var(--o2));-webkit-background-clip:text;background-clip:text;color:transparent;margin:6px 0 0}
+.unit{color:var(--muted);letter-spacing:.04em;margin-bottom:18px}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;text-align:left}
+.meta div{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.meta small{display:block;color:var(--muted);font-size:.74rem}.meta b{font-family:var(--head)}
+.ring{width:84px;height:84px;margin:0 auto 18px;border-radius:50%;border:4px solid rgba(255,255,255,.08);border-top-color:var(--o1);animation:rot 1s linear infinite;display:grid;place-items:center}
+.steps{list-style:none;margin-top:16px;font-size:.88rem;color:var(--muted)}
+.steps li{opacity:.25;transition:.4s}.steps li.on{opacity:1;color:var(--o2)}
+.errp{text-align:left}.errp .ic{font-size:2rem}.errp h3{color:var(--red);margin:6px 0}
+.errp pre{margin-top:12px;background:#04070f;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:.74rem;overflow-x:auto;color:#cfd7ee;white-space:pre}
+.errp ul{margin:10px 0 0 18px;font-size:.88rem;color:#d7b0b0}
+
+/* about */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{padding:24px;border-radius:20px;background:var(--panel);border:1px solid var(--line);transition:transform .25s,border-color .25s}
+.card:hover{transform:translateY(-4px);border-color:rgba(255,122,26,.5)}
+.card h3{font-size:1.1rem;margin-bottom:8px}.card p,.card li{color:var(--muted);font-size:.92rem}
+.card ul{padding-left:18px}
+.table{margin-top:26px;overflow-x:auto;border-radius:20px;border:1px solid var(--line);background:var(--panel)}
+table{width:100%;border-collapse:collapse;min-width:560px;font-size:.92rem}
+th,td{padding:14px 18px;text-align:left;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:500;font-size:.82rem}
+tr:last-child td{border-bottom:0}
+tr.best td{background:rgba(255,122,26,.09);font-weight:600}
+tr.best td:first-child{color:var(--o2)}
+.feat{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.feat span{font-size:.78rem;padding:5px 11px;border-radius:99px;border:1px solid var(--line);background:var(--panel2);color:#c4cce0}
+
+footer{border-top:1px solid var(--line);margin-top:40px;padding:40px 0;color:var(--muted);font-size:.9rem}
+.foot{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:center}
+.foot .links{gap:20px}
+
+@media(max-width:960px){.hero,.dash{grid-template-columns:1fr}.side{position:static}.cards{grid-template-columns:1fr}.links a.hide{display:none}}
+@media(max-width:560px){.grid{grid-template-columns:1fr}form{padding:6px 18px 22px}.big{font-size:4rem}.chip{display:none}.pill span.t{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap nav">
+  <a class="brand" href="#top"><span class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a0d00" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span>QuickBite <b>AI</b></a>
+  <div class="links">
+    <a class="hide" href="#predict">Predict</a><a class="hide" href="#about">About the model</a>
+    <span class="pill" title="Backend status"><i class="dot" id="dot"></i><span id="apiTxt">Checking API<span class="t"></span></span></span>
+  </div>
+</div></nav>
+
+<main id="top" class="wrap">
+  <header class="hero">
+    <div>
+      <span class="badge">⚡ Powered by tuned XGBoost</span>
+      <h1>Predict Your Food Delivery Time with <span>AI</span></h1>
+      <p class="lead">Describe the rider, the route, the order and the conditions on the road. Our model returns how many minutes the delivery will take.</p>
+      <div class="cta"><a class="btn" href="#predict">Start predicting</a><a class="btn ghost" href="#about">How it works</a></div>
+      <div class="stats">
+        <div><strong>45,162</strong><small>orders trained on</small></div>
+        <div><strong>0.83</strong><small>test R² score</small></div>
+        <div><strong>±3.9 min</strong><small>test RMSE</small></div>
+      </div>
+    </div>
+    <div class="scene" aria-hidden="true">
+      <svg viewBox="0 0 520 440">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#101a38"/><stop offset="1" stop-color="#070c1c"/></linearGradient>
+          <linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#ff7a1a"/><stop offset="1" stop-color="#ffb25e"/></linearGradient>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="rgba(255,255,255,.05)"/></pattern>
+          <filter id="glow"><feGaussianBlur stdDeviation="5"/></filter>
+        </defs>
+        <rect width="520" height="440" fill="url(#g1)"/><rect width="520" height="440" fill="url(#grid)"/>
+        <path d="M0 330 C120 300 160 370 280 330 S460 250 520 270" stroke="rgba(255,255,255,.06)" stroke-width="22" fill="none"/>
+        <path d="M60 110 C70 130 90 150 70 175 S0 210 60 240" stroke="rgba(255,255,255,.05)" stroke-width="16" fill="none"/>
+        <path id="route" d="M95 330 C170 180 250 340 330 220 S430 110 440 120" stroke="url(#g2)" stroke-width="5" stroke-linecap="round" fill="none" stroke-dasharray="4 12">
+          <animate attributeName="stroke-dashoffset" from="0" to="-64" dur="2.4s" repeatCount="indefinite"/></path>
+        <g transform="translate(95 330)"><circle r="22" fill="#ff7a1a" opacity=".35" filter="url(#glow)"/><circle r="11" fill="url(#g2)"/><text y="-22" text-anchor="middle" font-size="12" fill="#c4cce0" font-family="DM Sans">Restaurant</text></g>
+        <g transform="translate(440 120)"><circle r="22" fill="#3ddc97" opacity=".3" filter="url(#glow)"/><circle r="11" fill="#3ddc97"/><text y="-22" text-anchor="middle" font-size="12" fill="#c4cce0" font-family="DM Sans">You</text></g>
+        <g>
+          <animateMotion dur="7s" repeatCount="indefinite" rotate="0"><mpath href="#route"/></animateMotion>
+          <circle r="26" fill="#ff7a1a" opacity=".25" filter="url(#glow)"/>
+          <circle r="17" fill="#0b1226" stroke="url(#g2)" stroke-width="2.5"/>
+          <text y="6" text-anchor="middle" font-size="18">🛵</text>
+        </g>
+      </svg>
+      <div class="chip" style="top:7%;left:-4%">🍔 Snack</div>
+      <div class="chip" style="top:42%;right:-5%">🍱 Buffet</div>
+      <div class="chip" style="bottom:8%;left:6%">🥤 Drinks</div>
+    </div>
+  </header>
+
+  <section id="predict">
+    <div class="sec-h"><h2>Delivery prediction dashboard</h2><p>Fill in the order details below. Every field is required by the prediction API.</p></div>
+    <div class="dash">
+      <form class="glass" id="form" novalidate>
+        <div id="groups"></div>
+        <div class="actions">
+          <button class="btn" id="go" type="submit"><span class="spin"></span><span id="goTxt">Predict Delivery Time</span></button>
+          <button class="btn ghost" id="sample" type="button">Load example</button>
+          <button class="btn ghost" id="reset" type="reset">Clear</button>
+        </div>
+      </form>
+
+      <aside class="glass side" id="side" data-s="idle" aria-live="polite">
+        <div class="state idle"><div class="ghost-ic">🍽️</div><h3>Your estimate appears here</h3><p>Complete the form and run the prediction to see the delivery time in minutes.</p></div>
+        <div class="state load"><div class="ring">🛵</div><h3>Predicting…</h3>
+          <ul class="steps" id="steps"><li>Calculating route distance</li><li>Encoding order features</li><li>Scaling and running XGBoost</li></ul></div>
+        <div class="state ok">
+          <p>Estimated delivery time</p><div class="big" id="val">0</div><div class="unit" id="unit">minutes</div>
+          <div class="meta">
+            <div><small>Expected arrival</small><b id="eta">–</b></div>
+            <div><small>Route distance</small><b id="rd">–</b></div>
+            <div style="grid-column:1/-1"><small>Typical model error (test RMSE)</small><b>about ±3.9 minutes</b></div>
+          </div>
+        </div>
+        <div class="state errp"><div class="ic">⚠️</div><h3 id="et"></h3><p id="em"></p><ul id="el"></ul><pre id="ep" hidden></pre></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="sec-h"><h2>About the model</h2><p>A supervised regression model trained on historical food delivery orders. It predicts the target Time_taken(min).</p></div>
+    <div class="cards">
+      <div class="card"><h3>Data and cleaning</h3><ul><li>45,593 raw orders, 45,162 after removing impossible distances (over 100 km).</li><li>Text such as “conditions Sunny” cleaned, missing values filled with median or mode, ratings capped at 5.</li></ul></div>
+      <div class="card"><h3>Feature engineering</h3><p>Four coordinates become one <b>distance_km</b> via the Haversine formula, and the order time becomes <b>order_hour</b>. Traffic is encoded Low to Jam as 0 to 3; other categories are one-hot encoded and everything is standardised.</p></div>
+      <div class="card"><h3>Final model</h3><p>XGBoost Regressor tuned with randomised search (500 trees, depth 8, learning rate 0.01, subsample 0.9), trained on an 80/20 split.</p></div>
+    </div>
+    <div class="table"><table>
+      <thead><tr><th>Model</th><th>Test R²</th><th>Test RMSE (min)</th><th>Train R²</th></tr></thead>
+      <tbody>
+        <tr><td>Linear Regression</td><td>0.57</td><td>6.21</td><td>0.58</td></tr>
+        <tr><td>Decision Tree</td><td>0.67</td><td>5.47</td><td>1.00</td></tr>
+        <tr><td>Random Forest</td><td>0.82</td><td>4.04</td><td>0.97</td></tr>
+        <tr class="best"><td>XGBoost (tuned)</td><td>0.83</td><td>3.92</td><td>0.85</td></tr>
+      </tbody></table></div>
+    <div class="card" style="margin-top:18px"><h3>Inputs the model uses</h3>
+      <div class="feat"><span>Delivery_person_Age</span><span>Delivery_person_Ratings</span><span>distance_km</span><span>order_hour</span><span>Road_traffic_density</span><span>Vehicle_condition</span><span>multiple_deliveries</span><span>Type_of_order</span><span>Type_of_vehicle</span><span>Festival</span><span>City</span><span>Weatherconditions</span></div></div>
+  </section>
+</main>
+
+<footer><div class="wrap foot">
+  <div><div class="brand" style="font-size:1.05rem">QuickBite <b>AI</b></div><p style="margin-top:6px">Delivery time predictions from a trained XGBoost model.</p></div>
+  <div class="links"><a href="#predict">Predict</a><a href="#about">About</a><a href="#top">Back to top</a></div>
+  <p>© <span id="yr"></span> QuickBite AI</p>
+</div></footer>
+
+<script>
+const API_BASE = 'http://127.0.0.1:8000';
+const ENDPOINT = '/predict';         // POST, JSON body, matches DeliveryInput in app.py
+
+const ic = {
+  rider:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>',
+  route:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  order:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>',
+  cond:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 1 0 5 15.5"/><path d="M7 19h10"/></svg>'
+};
+const cities = [['Metropolitian','Metropolitan'],['Urban','Urban'],['Semi-Urban','Semi-urban']];
+const GROUPS = [
+ {t:'Delivery partner', i:'rider', f:[
+  {n:'Delivery_person_Age', l:'Rider age', type:'number', ph:'e.g. 30', min:15, max:50, step:1, h:'Years, 15 to 50'},
+  {n:'Delivery_person_Ratings', l:'Rider rating', type:'number', ph:'e.g. 4.7', min:1, max:5, step:0.1, h:'Scale of 1 to 5'},
+  {n:'Type_of_vehicle', l:'Vehicle type', type:'select', o:[['motorcycle','Motorcycle'],['scooter','Scooter'],['electric_scooter','Electric scooter'],['bicycle','Bicycle']]},
+  {n:'Vehicle_condition', l:'Vehicle condition', type:'select', o:[['0','0 · Poor'],['1','1 · Fair'],['2','2 · Good']], int:true}]},
+ {t:'Route', i:'route', f:[
+  {n:'Restaurant_latitude', l:'Restaurant latitude', type:'number', ph:'e.g. 22.745049', min:-90, max:90, step:'any'},
+  {n:'Restaurant_longitude', l:'Restaurant longitude', type:'number', ph:'e.g. 75.892471', min:-180, max:180, step:'any'},
+  {n:'Delivery_location_latitude', l:'Delivery latitude', type:'number', ph:'e.g. 22.765049', min:-90, max:90, step:'any'},
+  {n:'Delivery_location_longitude', l:'Delivery longitude', type:'number', ph:'e.g. 75.912471', min:-180, max:180, step:'any'},
+  {dist:true}]},
+ {t:'Order details', i:'order', f:[
+  {n:'order_time', l:'Order time', type:'time', h:'Sent to the API as HH:MM:SS'},
+  {n:'Type_of_order', l:'Order type', type:'select', o:[['Meal','Meal'],['Snack','Snack'],['Drinks','Drinks'],['Buffet','Buffet']]},
+  {n:'multiple_deliveries', l:'Other deliveries on this trip', type:'select', o:[['0','0'],['1','1'],['2','2'],['3','3']]},
+  {n:'City', l:'City type', type:'select', o:cities},
+  {n:'Festival', l:'Festival day', type:'seg', o:[['No','No'],['Yes','Yes']], def:'No', full:true}]},
+ {t:'Road and weather', i:'cond', f:[
+  {n:'Weatherconditions', l:'Weather', type:'select', o:[['Sunny','Sunny'],['Cloudy','Cloudy'],['Windy','Windy'],['Fog','Fog'],['Stormy','Stormy'],['Sandstorms','Sandstorms']]},
+  {n:'Road_traffic_density', l:'Traffic density', type:'seg', o:[['Low','Low'],['Medium','Medium'],['High','High'],['Jam','Jam']]}]}
+];
+const FIELDS = GROUPS.flatMap(g => g.f).filter(f => f.n);
+const $ = s => document.querySelector(s);
+
+/* ---------- render form ---------- */
+function ctrl(f){
+  if(f.type==='select') return `<select id="${f.n}" name="${f.n}" required><option value="" disabled selected>Select…</option>${f.o.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</select>`;
+  if(f.type==='seg') return `<div class="seg" role="radiogroup" aria-label="${f.l}">${f.o.map(o=>`<label><input type="radio" name="${f.n}" value="${o[0]}" ${f.def===o[0]?'checked':''}><span>${o[1]}</span></label>`).join('')}</div>`;
+  if(f.type==='time') return `<input id="${f.n}" name="${f.n}" type="time" step="1" required>`;
+  return `<input id="${f.n}" name="${f.n}" type="number" inputmode="decimal" min="${f.min}" max="${f.max}" step="${f.step}" placeholder="${f.ph}" required>`;
+}
+$('#groups').innerHTML = GROUPS.map(g => `<fieldset><legend><i>${ic[g.i]}</i>${g.t}</legend><div class="grid">${
+  g.f.map(f => f.dist
+    ? `<div class="dist" id="dist"><span>Straight-line distance (live preview)</span><b id="distV">–</b></div>`
+    : `<div class="field ${f.full?'full':''}" data-f="${f.n}"><label ${f.type==='seg'?'class="lab"':`for="${f.n}"`}>${f.l}</label>${ctrl(f)}${f.h?`<span class="hint">${f.h}</span>`:''}<span class="err"></span></div>`).join('')
+}</div></fieldset>`).join('');
+
+/* ---------- helpers ---------- */
+function haversine(a,b,c,d){const r=Math.PI/180,R=6371,dl=(c-a)*r,dn=(d-b)*r;
+  const x=Math.sin(dl/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
+const val = n => { const e=document.querySelector(`[name="${n}"]`); if(e.type==='radio') {const c=document.querySelector(`[name="${n}"]:checked`);return c?c.value:'';} return e.value.trim(); };
+function updateDist(){
+  const v=['Restaurant_latitude','Restaurant_longitude','Delivery_location_latitude','Delivery_location_longitude'].map(n=>parseFloat(val(n)));
+  const box=$('#dist'), out=$('#distV');
+  if(v.some(isNaN)){out.textContent='–';box.classList.remove('warn');return null;}
+  const d=haversine(...v); out.textContent=d.toFixed(2)+' km';
+  box.classList.toggle('warn',d>=100); return d;
+}
+function setErr(n,msg){const w=document.querySelector(`[data-f="${n}"]`); if(!w)return; w.classList.toggle('bad',!!msg); w.querySelector('.err').textContent=msg||'';}
+document.addEventListener('input',e=>{ if(e.target.name) setErr(e.target.name,''); updateDist(); });
+
+function validate(){
+  let ok=true, first=null;
+  FIELDS.forEach(f=>{
+    const v=val(f.n); let m='';
+    if(v==='') m='This field is required';
+    else if(f.type==='number'){
+      const x=parseFloat(v);
+      if(isNaN(x)) m='Enter a valid number';
+      else if(x<f.min||x>f.max) m=`Must be between ${f.min} and ${f.max}`;
+    }
+    setErr(f.n,m);
+    if(m){ok=false; first=first||f.n;}
+  });
+  const d=updateDist();
+  if(ok && d!==null && d>=100){ok=false;setErr('Delivery_location_latitude','Distance must be under 100 km (the model was trained on trips below that)');first='Delivery_location_latitude';}
+  if(first){const e=document.querySelector(`[name="${first}"]`);e.scrollIntoView({block:'center',behavior:'smooth'});e.focus({preventScroll:true});}
+  return ok;
+}
+
+function buildPayload(){
+  const p={};
+  FIELDS.forEach(f=>{
+    let v=val(f.n);
+    if(f.n==='order_time' && /^\d{2}:\d{2}$/.test(v)) v+=':00';   // backend expects %H:%M:%S
+    else if(f.n==='Vehicle_condition') v=parseInt(v,10);            // int in Pydantic
+    else if(f.type==='number' || f.n==='multiple_deliveries') v=parseFloat(v); // float in Pydantic
+    p[f.n]=v;
+  });
+  return p;
+}
+
+/* ---------- UI states ---------- */
+const side=$('#side'); let stepT;
+function state(s){side.dataset.s=s; side.querySelectorAll('.state').forEach(e=>{e.style.animation='none';e.offsetHeight;e.style.animation='';});}
+function loading(on){
+  $('#go').disabled=on; $('#go').classList.toggle('loading',on); $('#goTxt').textContent=on?'Predicting…':'Predict Delivery Time';
+  clearInterval(stepT); const li=[...document.querySelectorAll('#steps li')]; li.forEach(l=>l.classList.remove('on'));
+  if(on){let i=0; li[0].classList.add('on'); stepT=setInterval(()=>{i=Math.min(i+1,li.length-1);li[i].classList.add('on');},700);}
+}
+function showError(title,msg,list,code){
+  $('#et').textContent=title; $('#em').textContent=msg;
+  $('#el').innerHTML=(list||[]).map(x=>`<li>${x}</li>`).join('');
+  const p=$('#ep'); p.hidden=!code; p.textContent=code||'';
+  state('err'); side.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+function countUp(target){
+  const el=$('#val'), t0=performance.now(), dur=900;
+  (function f(t){const k=Math.min((t-t0)/dur,1),e=1-Math.pow(1-k,3); el.textContent=(target*e).toFixed(2); if(k<1)requestAnimationFrame(f); else el.textContent=target.toFixed(2);})(t0);
+}
+function arrival(timeStr,mins){
+  const [h,m,s]=timeStr.split(':').map(Number); const d=new Date(2000,0,1,h,m,s||0); d.setSeconds(d.getSeconds()+Math.round(mins*60));
+  return d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+}
+const CORS_FIX = `# run_cors.py  (app.py stays untouched)
+from app import app
+from fastapi.middleware.cors import CORSMiddleware
+app.add_middleware(CORSMiddleware,
+    allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+# then run:  uvicorn run_cors:app --reload`;
+
+/* ---------- API status ---------- */
+async function ping(){
+  try{ await fetch(API_BASE+'/',{mode:'no-cors',cache:'no-store'}); return true; }catch{ return false; }
+}
+async function status(){
+  const up=await ping(); $('#dot').className='dot '+(up?'on':'off'); $('#apiTxt').firstChild.nodeValue=up?'API online':'API offline';
+}
+status(); setInterval(status,20000);
+
+/* ---------- submit ---------- */
+$('#form').addEventListener('submit', async e=>{
+  e.preventDefault();
+  if(!validate()) return;
+  const payload=buildPayload(); const dist=updateDist();
+  state('load'); loading(true);
+  const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),20000);
+  try{
+    const res=await fetch(API_BASE+ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload),signal:ctl.signal});
+    let data=null; try{data=await res.json();}catch{}
+    if(!res.ok){
+      if(res.status===422 && data && Array.isArray(data.detail)){
+        const msgs=data.detail.map(d=>{const f=d.loc&&d.loc[d.loc.length-1]; if(f) setErr(String(f),d.msg); return `${f||'body'}: ${d.msg}`;});
+        return showError('The API rejected some inputs','Check the highlighted fields and try again.',msgs);
+      }
+      if(res.status>=500) return showError('The prediction service hit an error',`The server responded with status ${res.status}.`,['Check the uvicorn terminal for the traceback','Make sure xgb_best.pkl, standard_scaler.pkl and model_columns.pkl are in the folder you run the server from']);
+      return showError(`Request failed (${res.status})`, (data&&(data.detail||data.error))||res.statusText||'Unexpected response from the server.');
+    }
+    if(data && data.error){            // app.py returns {"error": "..."} with HTTP 200 for bad values
+      if(/order_time/i.test(data.error)) setErr('order_time',data.error);
+      if(/traffic/i.test(data.error)) setErr('Road_traffic_density',data.error);
+      return showError('The API could not process this order',String(data.error));
+    }
+    if(!data || typeof data.predicted_delivery_time!=='number') return showError('Unexpected response','The server replied without a predicted_delivery_time number.',[JSON.stringify(data)]);
+    const mins=data.predicted_delivery_time;
+    $('#unit').textContent=data.unit||'minutes';
+    $('#eta').textContent=arrival(payload.order_time,mins);
+    $('#rd').textContent=dist!==null?dist.toFixed(2)+' km':'–';
+    state('ok'); countUp(mins);
+    side.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }catch(err){
+    if(err.name==='AbortError') return showError('The request timed out','The server did not answer within 20 seconds.',['Check that uvicorn is running and the model files loaded']);
+    const up=await ping();
+    if(up) showError('Browser blocked the request (CORS)','The API is running at '+API_BASE+', but app.py does not allow requests from this page’s origin. Without editing app.py, run it through a small wrapper:',null,CORS_FIX);
+    else showError('Cannot reach the API',`Nothing is responding at ${API_BASE}.`,['Start the backend: uvicorn app:app --reload','Run it from the folder that contains the three .pkl files','Confirm it uses port 8000']);
+  }finally{ clearTimeout(to); loading(false); status(); }
+});
+
+/* ---------- helpers: example / reset ---------- */
+const EX={Delivery_person_Age:30,Delivery_person_Ratings:4.7,Type_of_vehicle:'motorcycle',Vehicle_condition:'2',Restaurant_latitude:22.745049,Restaurant_longitude:75.892471,Delivery_location_latitude:22.765049,Delivery_location_longitude:75.912471,order_time:'19:45:00',Type_of_order:'Meal',multiple_deliveries:'1',City:'Urban',Festival:'No',Weatherconditions:'Cloudy',Road_traffic_density:'High'};
+$('#sample').onclick=()=>{
+  Object.entries(EX).forEach(([n,v])=>{ const els=document.querySelectorAll(`[name="${n}"]`); els.forEach(e=>{ if(e.type==='radio') e.checked=(e.value===String(v)); else e.value=v; }); setErr(n,''); });
+  updateDist();
+};
+$('#form').addEventListener('reset',()=>{ setTimeout(()=>{ FIELDS.forEach(f=>setErr(f.n,'')); document.querySelector('[name="Festival"][value="No"]').checked=true; updateDist(); state('idle'); },0); });
+$('#yr').textContent=new Date().getFullYear();
+</script>
+</body>
+</html>
