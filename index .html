@@ -253,7 +253,7 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding:40px 0;color:var
 </div></footer>
 
 <script>
-const API_BASE = 'http://127.0.0.1:8000';
+const API_BASE = window.location.origin; // Works locally and on Render using the same host
 const ENDPOINT = '/predict';         // POST, JSON body, matches DeliveryInput in app.py
 
 const ic = {
@@ -368,13 +368,7 @@ function arrival(timeStr,mins){
   const [h,m,s]=timeStr.split(':').map(Number); const d=new Date(2000,0,1,h,m,s||0); d.setSeconds(d.getSeconds()+Math.round(mins*60));
   return d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
 }
-const CORS_FIX = `# run_cors.py  (app.py stays untouched)
-from app import app
-from fastapi.middleware.cors import CORSMiddleware
-app.add_middleware(CORSMiddleware,
-    allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-# then run:  uvicorn run_cors:app --reload`;
 
 /* ---------- API status ---------- */
 async function ping(){
@@ -418,8 +412,8 @@ $('#form').addEventListener('submit', async e=>{
   }catch(err){
     if(err.name==='AbortError') return showError('The request timed out','The server did not answer within 20 seconds.',['Check that uvicorn is running and the model files loaded']);
     const up=await ping();
-    if(up) showError('Browser blocked the request (CORS)','The API is running at '+API_BASE+', but app.py does not allow requests from this page’s origin. Without editing app.py, run it through a small wrapper:',null,CORS_FIX);
-    else showError('Cannot reach the API',`Nothing is responding at ${API_BASE}.`,['Start the backend: uvicorn app:app --reload','Run it from the folder that contains the three .pkl files','Confirm it uses port 8000']);
+    if(up) showError('Could not complete the prediction','The backend is reachable, but the prediction request failed. Check the browser console and the Render logs for the exact error.');
+    else showError('Cannot reach the API',`Nothing is responding at ${API_BASE}.`,['Check that the Render service is running','Open the live site from the same Render deployment as the API','Check the Render logs for startup errors']);
   }finally{ clearTimeout(to); loading(false); status(); }
 });
 
